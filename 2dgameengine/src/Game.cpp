@@ -1,5 +1,7 @@
 #include "Game.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_image.h>
 #include <iostream>
 
 Game::Game() {
@@ -16,23 +18,35 @@ void Game::Initialize() {
 		std::cerr << "Error initializing SDL" << std::endl;
 		return;
 	}
+	// Window params
+	SDL_DisplayMode displayMode;
+	SDL_GetCurrentDisplayMode(0, &displayMode);
+	windowWidth = displayMode.w;
+	windowHeight = displayMode.h;
 	window = SDL_CreateWindow(
 		NULL,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		800,
-		600,
+		windowWidth,
+		windowHeight,
 		SDL_WINDOW_BORDERLESS
 	);
 	if (!window) {
 		std::cerr << "Error creating SDL window" << std::endl;
 		return;
 	}
-	renderer = SDL_CreateRenderer(window, -1, 0);
+
+	// Renderer params
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
+	 SDL_RENDERER_PRESENTVSYNC);
+
 	if (!renderer){
 		std::cerr << "Error creating SDL renderer" << std::endl;
 		return;
 	}
+
+	//Real Full Screen
+	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
 	isRunning = true;
 }
@@ -53,20 +67,31 @@ void Game::ProcessInput() {
 	}
 }
 
+void Game::Setup(){
+
+}
+
 void Game::Update() {
 
 }
 
 void Game::Render() {
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
 	SDL_RenderClear(renderer);
 
-	//TODO: Render game objects here...
+	SDL_Surface* surface = IMG_Load("./assets/images/tank-tiger-right.png");
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_FreeSurface(surface);
 
+	SDL_Rect dstRect = {10, 10, 32, 32};
+	SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+	SDL_DestroyTexture(texture);
+	
 	SDL_RenderPresent(renderer);
 }
 
 void Game::Run() {
+	Setup();
 	while(isRunning) {
 		ProcessInput();
 		Update();
