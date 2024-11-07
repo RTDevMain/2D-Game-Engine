@@ -2,3 +2,4 @@ sdl2
 *.sublime-project
 *.sublime-workspace
 compile_commands.json
+.cache/
