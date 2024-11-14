@@ -31,7 +31,14 @@ class Entity {
 
 	public:
 		Entity(int id): id(id) {}; // Syntax used to automatically initialize constructor
-		int GetId() const;	
+		int GetId() const;
+
+		// Testing operator overloading
+		Entity& operator = (const Entity& other) = default;
+		bool operator == (const Entity& other) const {return id == other.id;}
+		bool operator != (const Entity& other) const {return id != other.id;}
+		bool operator > (const Entity& other) const {return id > other.id;}	
+		bool operator < (const Entity& other) const {return id < other.id;}	
 };
 
 
@@ -72,13 +79,73 @@ class System {
 
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Pool: A vector (contiguous data) of objects of type T
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class IPool {
+	public:
+		virtual ~IPool() {}
+};
+
+
+template <typename T>
+class Pool: IPool {
+	private:
+		std::vector<T> data;
+
+
+	public:
+		Pool(int size = 100) {
+			data.resize(size);
+		}
+
+		virtual ~Pool() = default;	
+
+		bool isEmpty() const {
+			return data.empty();
+		}
+
+		int GetSize() const {
+			return data.size();
+		}
+
+		void Resize(int n) {
+			data.resize(n);
+		}
+
+		void Clear() {
+			data.clear();
+		}
+
+		void Add(T object) {
+			data.push_back(object);
+		}
+
+		void Set(int index, T object) {
+			data[index] = object;
+		}
+
+		T& Get(int index) {
+			return static_cast<T&>(data[index]);
+		}
+
+		T& operator [](unsigned int index) {
+			return data[index];
+		}
+};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Registry: Manages the creation/destruction of Entities.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Registry {
-	//TODO:
+	private:
+		int numEntities = 0;
+		
+		std::vector<IPool*> componentPools;
+
+	public:
+		
 };
 
 
