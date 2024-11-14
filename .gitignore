@@ -1,5 +1,5 @@
 sdl2
 *.sublime-project
 *.sublime-workspace
-compile_commands.json
-.cache/
+2dgameengine/compile_commands.json
+2dgameengine/.cache/
