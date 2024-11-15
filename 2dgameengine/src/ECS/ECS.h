@@ -2,7 +2,10 @@
 #define ECS_H
 
 #include <bitset>
+#include <typeindex>
+#include <unordered_map>
 #include <vector>
+#include <set>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Fields & Types
@@ -141,10 +144,42 @@ class Pool: IPool {
 class Registry {
 	private:
 		int numEntities = 0;
-		
+
+		// Each pool contains all data for a certain component type
+		// [Vector index = component type id]
+		// [Pool index = entity id]
 		std::vector<IPool*> componentPools;
 
+		// Per entity component signatures, implies which components are on/off
+		// [Vector index = entity id]
+		std::vector<Signature> entityComponentSignatures;
+
+		std::unordered_map<std::type_index, System*> systems;
+
+		// Set of entities that are flagged to be added/removed in next registry update
+		std::set<Entity> entitiesToBeAdded;
+		std::set<Entity> entitiesToBeRemoved;
+
 	public:
+		Registry() = default;
+
+		// TODO:
+
+		Entity CreateEntity();
+
+		void Update();
+
+		void AddEntityToSystem();
+
+		// KillEntity()
+		// AddComponent(Entity entity)
+		// RemoveComponent(Entity entity)
+		// HasComponent(Entity entity)
+		//
+		// AddSystem()
+		// RemoveSystem()
+		// HasSystem()
+		// GetSystem()
 		
 };
 
