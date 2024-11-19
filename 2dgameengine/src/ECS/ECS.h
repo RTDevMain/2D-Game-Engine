@@ -4,6 +4,7 @@
 #include <bitset>
 #include <typeindex>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include <set>
 
@@ -171,11 +172,14 @@ class Registry {
 
 		void AddEntityToSystem();
 
-		// KillEntity()
-		// AddComponent(Entity entity)
-		// RemoveComponent(Entity entity)
-		// HasComponent(Entity entity)
+		template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
+
+		template <typename T> void RemoveComponent(Entity entity);
+
+		template <typename T> bool HasComponent(Entity entity);
+
 		//
+		// KillEntity()
 		// AddSystem()
 		// RemoveSystem()
 		// HasSystem()
@@ -188,6 +192,50 @@ template <typename TComponent>
 void System::RequireComponent() {
 	const auto componentId = Component<TComponent>::GetId();
 	componentSignature.set(componentId);
+}
+
+template <typename TComponent, typename ...TArgs>
+void Registry::AddComponent(Entity entity, TArgs&& ...args) {
+	const auto componentId = Component<TComponent>::GetId();
+	const auto entityId = entity.GetId();
+
+	// If 
+
+	if (componentId >= componentPools.size()) {
+		componentPools.resize(componentId + 1, nullptr);
+	}
+
+	if (!componentPools[componentId]) {
+		Pool<TComponent>* newComponentPool = new Pool<TComponent>();
+		componentPools[componentId] = newComponentPool;
+	}
+
+	Pool<TComponent>* componentPool = componentPools[componentId];
+
+	if (entityId >= componentPool->GetSize()) {
+		componentPool->Resize(numEntities);
+	}
+
+	TComponent newComponent(std::forward<TArgs>(args)...);
+	componentPool->Set(entityId, newComponent);
+	entityComponentSignatures[entityId].set(componentId);
+
+}
+
+template <typename T>
+void Registry::RemoveComponent(Entity entity) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+
+	entityComponentSignatures[entityId].set(componentId, false);
+}
+
+template <typename T>
+bool Registry::HasComponent(Entity entity) {
+	const auto componentId = Component<T>::GetId();
+	const auto entityId = entity.GetId();
+
+	return entityComponentSignatures[entityId].test(componentId);
 }
 
 #endif
