@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "../ECS/ECS.h"
 #include <SDL2/SDL.h>
 
 // Optional fps cap
@@ -13,6 +14,8 @@ private:
 	int msPreviousFrame;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+
+	Registry* registry;
 
 public:
 	Game();
